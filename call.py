@@ -92,10 +92,4 @@ class call_igblast():
         }
 
     def _parse_aux(self):
-        aux_dict = {'human':self.aux_location+"human_gl.aux",
-                    'mouse':self.aux_location+"mouse_gl.aux",
-                    'rat':self.aux_location+"rat_gl.aux",
-                    'rabbit':self.aux_location+"rabbit_gl.aux"
-
-        }
-        self.aux_file = aux_dict[self.species]  
+        self.aux_file = '{0}{1}_g1_aux'.format(self.aux_location, self.species)
