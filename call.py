@@ -49,7 +49,8 @@ class call_igblast():
     def run(self):
 
         #set up args
-        args = [self.location,'-query',self.input,'-germline_db_V',self.prepends[self.species+"_v"],'-germline_db_D',self.prepends[self.species+"_d"],'-germline_db_J',self.prepends[self.species+"_j"],
+        args = [self.location,'-query',self.input,'-germline_db_V',self.prepends[self.species+"_v"],
+        '-germline_db_D',self.prepends[self.species+"_d"],'-germline_db_J',self.prepends[self.species+"_j"],
         "-outfmt","7","-show_translation"
         ]
 
