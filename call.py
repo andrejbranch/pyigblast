@@ -92,4 +92,4 @@ class call_igblast():
         }
 
     def _parse_aux(self):
-        self.aux_file = '{0}{1}_g1_aux'.format(self.aux_location, self.species)
+        self.aux_file = '{0}{1}_gl.aux'.format(self.aux_location, self.species)
