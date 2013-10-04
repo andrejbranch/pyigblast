@@ -15,7 +15,7 @@ class call_igblast():
     --KeyWord
     location - The location of the igBlastExecutable (default location="/usr/bin/igblastn")'''
     
-    def __init__(self,input,d_location,aux_location,location="/usr/bin/igblastn",species='human'):
+    def __init__(self,input,d_location,aux_location="./",location="/usr/bin/igblastn",species='human'):
         #all I need now is the location of the executable
         self.location = location
         self.database_folder = d_location
@@ -36,15 +36,16 @@ class call_igblast():
             sys.exit()
 
         #aux location
-        if os.path.exists(aux_location):
-            self.aux_location = aux_location
-            self._parse_aux()
-        else:
-            print "Check location of location of auxiliry folder {0}\n".format(aux_location)
-            checker = raw_input("Press 1 to continue without aux file\n")
-            if checker != "1":
-                print "Cancelling Job"
-                sys.exit()
+        #garbage       
+        # if os.path.exists(aux_location):
+        #     self.aux_location = aux_location
+        #     self._parse_aux()
+        # else:
+        #     print "Check location of location of auxiliry folder {0}\n".format(aux_location)
+        #     checker = raw_input("Press 1 to continue without aux file\n")
+        #     if checker != "1":
+        #         print "Cancelling Job"
+        #         sys.exit()
 
     def run(self):
 
@@ -55,9 +56,9 @@ class call_igblast():
         ]
 
         #did they specify and aux file?
-        if self.aux_file:
-            args += ['-auxiliary_data',self.aux_file]
-        print "Run:\n{0}".format(" ".join(args))
+   #     if self.aux_file:
+    #        args += ['-auxiliary_data',self.aux_file]
+    #    print "Run:\n{0}".format(" ".join(args))
         
         #call
         subprocess.call(args)

@@ -1,9 +1,7 @@
-import sys
-
+#import sys
 from call import call_igblast as cig 
-input_file  = sys.argv[1]
-database_location = sys.argv[2]
-aux_location = sys.argv[3]
+from arg_parse import blastargument_parser
 
-run_ig = cig(input_file,database_location,aux_location)
+ap = blastargument_parser().return_parsed_args()
+run_ig = cig(ap.query,ap.db_path)
 run_ig.run()
