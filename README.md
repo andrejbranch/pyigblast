@@ -5,3 +5,4 @@ PyIgBlast - Open source Parser to call IgBlast and parse results for high-throug
 
 #Major Commits 
 8/1/2013 just broad functionality
+8/6/2013 Full functionality with multiprocessing and a formatting template
