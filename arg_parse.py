@@ -141,7 +141,7 @@ class blastargument_parser():
         if self.args.show_translation:
             self.args_dict['-show_translation']=''
         if self.args.aux_path:
-            self.args_dict['-auxiliary_data'] = self.args.aux_path,
+            self.args_dict['-auxiliary_data'] = "{0}{1}_gl.aux".format(self.args.aux_path,self.args.organism)
     
         #add formatting option
         if self.args.format_options == 'default':
@@ -172,6 +172,12 @@ class blastargument_parser():
             cline.append(str(self.args_dict[command]))
         return ' '.join(cline)
 
+    def return_command_line_from_dict(self,cline_dict):
+        cline = [self.args.executable]
+        for command in cline_dict:
+            cline.append(str(command))
+            cline.append(str(self.args_dict[command]))
+        return cline
 
 
 if __name__ == '__main__':
