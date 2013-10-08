@@ -88,7 +88,7 @@ class blastargument_parser():
 
     def _check_if_executable_exists(self,x_path):
         if not os.path.exists(x_path):
-            msg = "path to executable {0}does not exist\n".format(x_path)
+            msg = "path to executable {0} does not exist, use -h for help\n".format(x_path)
             raise argparse.ArgumentTypeError(msg)
         if not os.access(x_path, os.R_OK):
             msg1 = "executable {0} does not permission to run\n".format(x_path)
@@ -113,8 +113,9 @@ class blastargument_parser():
 
     def _make_args_dict(self):
         #copy internal data directory to current location
+        #shutil.copytree(self.args.internal_data,'.')
         try:
-            shutil.copytree(self.args.internal_data,'.')
+            shutil.copytree(self.args.internal_data,'./internal_data')
         except OSError:
             print "Internal Data direcotry file exists in this directory, skipping..."
 
@@ -172,7 +173,7 @@ class blastargument_parser():
         if self.args.executable:
             cline = [self.args.executable]
         else:
-            cline = ['/usr/bin/igblastn']
+            cline = [self._check_if_executable_exists("/usr/bin/igblastn")]
         for command in self.args_dict:
             cline.append(str(command))
             cline.append(str(self.args_dict[command]))
@@ -182,7 +183,7 @@ class blastargument_parser():
         if self.args.executable:
             cline = [self.args.executable]
         else:
-            cline = ['/usr/bin/igblastn']
+            cline = [self._check_if_executable_exists("/usr/bin/igblastn")]
         for command in cline_dict:
             cline.append(str(command))
             cline.append(str(self.args_dict[command]))
