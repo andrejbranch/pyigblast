@@ -11,7 +11,7 @@ class blastargument_parser():
         self.parser = argparse.ArgumentParser(prog="igblast", formatter_class=argparse.RawTextHelpFormatter, description=textwrap.dedent('''\
                                     PyIgBlast
                     __________________________________________________________________________________________\n
-                    PyIgBlast calls upon igblastn for nucleotides. Uses multiproecessing to split up fasta file. 
+                    PyIgBlast calls upon igblastn for nucleotides. Uses multiproecessing to split up fasta file.
                     Parses the output to a csv/tsv/JSON and allows upload to MongoDB or MySQL databases
                     author - Joran Willis
                     '''))
@@ -28,7 +28,7 @@ class blastargument_parser():
         #internal_data path
         neces.add_argument(
             "-i","--internal_data",required=True,type=self._check_if_db_exists,help="The database path to internal data repertoire")
-        
+
         #recommended options
         recommended = self.parser.add_argument_group(
             title="\nRecommended",description="Not necessary to run but recommended")
@@ -66,15 +66,15 @@ class blastargument_parser():
          qseqid sseqid pident length mismatch gapopen qstart qend sstart send\n\n\
          The format file is in the database path as format_template.txt. Uncomment out the metrics you want to use")
 
-        
+
         #one special boolean case
         self.show_translation = False
         #return the arguments
         self.args = self.parser.parse_args()
         #get them ready to ship out
-        self._make_args_dict()    
+        self._make_args_dict()
 
-    
+
     #helper functions
     def _check_if_fasta(self,f_file):
         try:
@@ -117,9 +117,9 @@ class blastargument_parser():
             shutil.copytree(self.args.internal_data,'.')
         except OSError:
             print "Internal Data direcotry file exists in this directory, skipping..."
-           
 
-        self.args_dict = { 
+
+        self.args_dict = {
                       '-query':self.args.query,
                       '-organism':self.args.organism,
                       '-num_alignments_V':self.args.num_v,
@@ -140,12 +140,12 @@ class blastargument_parser():
         if self.args.penalty_mismatch:
             self.args_dict['-penalty'] = self.args.penalty_mismatch
         if self.args.reward_match:
-            self.args_dict['-reward'] = self.args.reward_match 
+            self.args_dict['-reward'] = self.args.reward_match
         if self.args.show_translation:
             self.show_translation = True
         if self.args.aux_path:
             self.args_dict['-auxiliary_data'] = "{0}{1}_gl.aux".format(self.args.aux_path,self.args.organism)
-    
+
         #add formatting option
         if self.args.format_options == 'default':
             self.args_dict['-outfmt'] = 7
@@ -157,19 +157,22 @@ class blastargument_parser():
                     continue
                 else:
                     formatting_titles.append(line.split()[0])
-            
-            format = "7 " + " ".join(formatting_titles) 
+
+            format = "7 " + " ".join(formatting_titles)
             self.args_dict['-outfmt'] = format
 
 
 
 
-    #only non memeber functions needed 
+    #only non memeber functions needed
     def return_parsed_args(self):
         return self.args_dict
 
     def return_command_line(self):
-        cline = [self.args.executable]
+        if self.args.executable:
+            cline = [self.args.executable]
+        else:
+            cline = ['/usr/bin/igblastn']
         for command in self.args_dict:
             cline.append(str(command))
             cline.append(str(self.args_dict[command]))
