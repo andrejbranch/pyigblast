@@ -3,6 +3,7 @@ import textwrap
 from Bio import SeqIO
 import os
 import shutil
+from multiprocessing import cpu_count
 
 class blastargument_parser():
   # call on all our file type parsers in the sequence_anlysis_method
@@ -11,7 +12,7 @@ class blastargument_parser():
         self.parser = argparse.ArgumentParser(prog="igblast", formatter_class=argparse.RawTextHelpFormatter, description=textwrap.dedent('''\
                                     PyIgBlast
                     __________________________________________________________________________________________\n
-                    PyIgBlast calls upon igblastn for nucleotides. Uses multiproecessing to split up fasta file. 
+                    PyIgBlast calls upon igblastn for nucleotides. Uses multiproecessing to split up fasta file.
                     Parses the output to a csv/tsv/JSON and allows upload to MongoDB or MySQL databases
                     author - Joran Willis
                     '''))
@@ -28,7 +29,7 @@ class blastargument_parser():
         #internal_data path
         neces.add_argument(
             "-i","--internal_data",required=True,type=self._check_if_db_exists,help="The database path to internal data repertoire")
-        
+
         #recommended options
         recommended = self.parser.add_argument_group(
             title="\nRecommended",description="Not necessary to run but recommended")
@@ -51,13 +52,14 @@ class blastargument_parser():
         #General Blast Settings
         general = self.parser.add_argument_group(
             title="\nGeneral Settings",description="General Settings for Blast")
-        general.add_argument("-x",'--executable',type=self._check_if_executable_exists,default='/usr/bin/igblastn',help="The location of the executable, default is /usr/bin/igblastn")
+        general.add_argument("-x",'--executable',type=self._check_if_executable_exists,help="The location of the executable, default is /usr/bin/igblastn")
         general.add_argument("-o","--out",help="output file prefix",default="igblast_out_")
         general.add_argument("-e","--e_value",type=str,default="1e-15",help="Real value for excpectation value threshold in blast, put in scientific notation")
         general.add_argument("-w","--word_size",type=int,default=4,help="Word size for wordfinder algorithm")
         general.add_argument("-pm","--penalty_mismatch",type=int,default=0,help="Penalty for nucleotide mismatch")
         general.add_argument("-rm","--reward_match",type=int,default=0,help="Reward for nucleotide match")
         general.add_argument("-mT","--max_target_seqs",type=int,default=500,help="Maximum number of alingned sequences to iterate through at a time")
+        general.add_argument("-nP","--num_procs",type=int,default=cpu_count(),help="How many do you want to split the job across, default is the number of processors")
 
         formatter = self.parser.add_argument_group(
             title="Formatting Options",description="Formatting options mostly available"
@@ -66,15 +68,15 @@ class blastargument_parser():
          qseqid sseqid pident length mismatch gapopen qstart qend sstart send\n\n\
          The format file is in the database path as format_template.txt. Uncomment out the metrics you want to use")
 
-        
+
         #one special boolean case
         self.show_translation = False
         #return the arguments
         self.args = self.parser.parse_args()
         #get them ready to ship out
-        self._make_args_dict()    
+        self._make_args_dict()
 
-    
+
     #helper functions
     def _check_if_fasta(self,f_file):
         try:
@@ -88,7 +90,7 @@ class blastargument_parser():
 
     def _check_if_executable_exists(self,x_path):
         if not os.path.exists(x_path):
-            msg = "path to executable {0}does not exist\n".format(x_path)
+            msg = "path to executable {0} does not exist, use -h for help\n".format(x_path)
             raise argparse.ArgumentTypeError(msg)
         if not os.access(x_path, os.R_OK):
             msg1 = "executable {0} does not permission to run\n".format(x_path)
@@ -113,13 +115,14 @@ class blastargument_parser():
 
     def _make_args_dict(self):
         #copy internal data directory to current location
+        #shutil.copytree(self.args.internal_data,'.')
         try:
-            shutil.copytree(self.args.internal_data,'.')
+            shutil.copytree(self.args.internal_data,'./internal_data')
         except OSError:
             print "Internal Data direcotry file exists in this directory, skipping..."
-           
 
-        self.args_dict = { 
+
+        self.args_dict = {
                       '-query':self.args.query,
                       '-organism':self.args.organism,
                       '-num_alignments_V':self.args.num_v,
@@ -140,12 +143,12 @@ class blastargument_parser():
         if self.args.penalty_mismatch:
             self.args_dict['-penalty'] = self.args.penalty_mismatch
         if self.args.reward_match:
-            self.args_dict['-reward'] = self.args.reward_match 
+            self.args_dict['-reward'] = self.args.reward_match
         if self.args.show_translation:
             self.show_translation = True
         if self.args.aux_path:
             self.args_dict['-auxiliary_data'] = "{0}{1}_gl.aux".format(self.args.aux_path,self.args.organism)
-    
+
         #add formatting option
         if self.args.format_options == 'default':
             self.args_dict['-outfmt'] = 7
@@ -157,26 +160,27 @@ class blastargument_parser():
                     continue
                 else:
                     formatting_titles.append(line.split()[0])
-            
-            format = "7 " + " ".join(formatting_titles) 
+
+            format = "7 " + " ".join(formatting_titles)
             self.args_dict['-outfmt'] = format
 
 
-
-
-    #only non memeber functions needed 
+    #only non memeber functions needed
     def return_parsed_args(self):
         return self.args_dict
 
     def return_command_line(self):
-        cline = [self.args.executable]
-        for command in self.args_dict:
-            cline.append(str(command))
-            cline.append(str(self.args_dict[command]))
-        return ' '.join(cline)
+        '''return solid strin of command line'''
+        return ' '.join(self.return_command_line_from_dict(self.args_dict))
 
     def return_command_line_from_dict(self,cline_dict):
-        cline = [self.args.executable]
+        '''return command line as a list to put in subprocess
+        --args
+        cline_dict - The command line dictionary to return. We add in the executable'''
+        if self.args.executable:
+            cline = [self.args.executable]
+        else:
+            cline = [self._check_if_executable_exists("/usr/bin/igblastn")]
         for command in cline_dict:
             cline.append(str(command))
             cline.append(str(self.args_dict[command]))
