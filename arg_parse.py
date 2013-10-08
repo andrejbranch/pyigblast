@@ -3,6 +3,7 @@ import textwrap
 from Bio import SeqIO
 import os
 import shutil
+from multiprocessing import cpu_count
 
 class blastargument_parser():
   # call on all our file type parsers in the sequence_anlysis_method
@@ -58,6 +59,7 @@ class blastargument_parser():
         general.add_argument("-pm","--penalty_mismatch",type=int,default=0,help="Penalty for nucleotide mismatch")
         general.add_argument("-rm","--reward_match",type=int,default=0,help="Reward for nucleotide match")
         general.add_argument("-mT","--max_target_seqs",type=int,default=500,help="Maximum number of alingned sequences to iterate through at a time")
+        general.add_argument("-nP","--num_procs",type=int,default=cpu_count(),help="How many do you want to split the job across, default is the number of processors")
 
         formatter = self.parser.add_argument_group(
             title="Formatting Options",description="Formatting options mostly available"
@@ -163,23 +165,18 @@ class blastargument_parser():
             self.args_dict['-outfmt'] = format
 
 
-
-
     #only non memeber functions needed
     def return_parsed_args(self):
         return self.args_dict
 
     def return_command_line(self):
-        if self.args.executable:
-            cline = [self.args.executable]
-        else:
-            cline = [self._check_if_executable_exists("/usr/bin/igblastn")]
-        for command in self.args_dict:
-            cline.append(str(command))
-            cline.append(str(self.args_dict[command]))
-        return ' '.join(cline)
+        '''return solid strin of command line'''
+        return ' '.join(self.return_command_line_from_dict(self.args_dict))
 
     def return_command_line_from_dict(self,cline_dict):
+        '''return command line as a list to put in subprocess
+        --args
+        cline_dict - The command line dictionary to return. We add in the executable'''
         if self.args.executable:
             cline = [self.args.executable]
         else:
