@@ -51,7 +51,7 @@ class blastargument_parser():
         #General Blast Settings
         general = self.parser.add_argument_group(
             title="\nGeneral Settings",description="General Settings for Blast")
-        general.add_argument("-x",'--executable',type=self._check_if_executable_exists,default='/usr/bin/igblastn',help="The location of the executable, default is /usr/bin/igblastn")
+        general.add_argument("-x",'--executable',type=self._check_if_executable_exists,help="The location of the executable, default is /usr/bin/igblastn")
         general.add_argument("-o","--out",help="output file prefix",default="igblast_out_")
         general.add_argument("-e","--e_value",type=str,default="1e-15",help="Real value for excpectation value threshold in blast, put in scientific notation")
         general.add_argument("-w","--word_size",type=int,default=4,help="Word size for wordfinder algorithm")
@@ -176,7 +176,10 @@ class blastargument_parser():
         return ' '.join(cline)
 
     def return_command_line_from_dict(self,cline_dict):
-        cline = [self.args.executable]
+        if self.args.executable:
+            cline = [self.args.executable]
+        else:
+            cline = ['/usr/bin/igblastn']
         for command in cline_dict:
             cline.append(str(command))
             cline.append(str(self.args_dict[command]))
