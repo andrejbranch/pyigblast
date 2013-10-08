@@ -56,7 +56,7 @@ def run(file_num):
     arg_dict['-query'] = file_num
     arg_dict['-out'] = file_num+".blast_out"
     cline = arg_parser.return_command_line_from_dict(arg_dict)
-    
+    print " ".join(cline)
     #special case - can't figure how else to add this option
     if arg_parser.show_translation:
         cline.append("-show_translation")
