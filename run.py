@@ -5,7 +5,7 @@ import multiprocessing as mp
 import glob
 import os
 import Bio
-import time
+from time import time
 
 #setup global class to pass around the command line
 arg_parser = blastargument_parser() 
@@ -53,12 +53,16 @@ def remove_temp_files(files_to_remove):
 
 def run(file_num):
     #append the file name before running the file
-    print file_num
     arg_dict['-query'] = file_num
     arg_dict['-out'] = file_num+".blast_out"
     cline = arg_parser.return_command_line_from_dict(arg_dict)
+    
+    #special case - can't figure how else to add this option
+    if arg_parser.show_translation:
+        cline.append("-show_translation")
+    
+
     #call on igBlast
-   #print " ".join(cline)
     sp.call(cline)
 
 def concat_files(out_files):
@@ -84,6 +88,7 @@ def concat_files(out_files):
 
 
 if __name__ == '__main__':
+    now = time()
     num_procs = mp.cpu_count()
     mp_pool = mp.Pool(processes=num_procs)
     entry_num = split_file(num_procs)
@@ -91,3 +96,5 @@ if __name__ == '__main__':
     mp_pool.map(run,tmp_file)
     remove_temp_files(tmp_file)
     concat_files(tmp_file)
+    then = time()
+    print "Process of {0} seqeunces using {1} processors took {2} seconds".format(entry_num,num_procs,then-now)

@@ -46,12 +46,12 @@ class blastargument_parser():
         igspec.add_argument("-nJ","--num_j",default=3,type=int,help="How many J-genes to match?")
         igspec.add_argument("-dgm","--d_gene_matches",default=5,type=int,help="How many nuclodtieds in the D-gene must match to call it a hit")
         igspec.add_argument("-s","--domain",default="imgt",choices=["imgt","kabat"],help="Which classification system do you want")
-        igspec.add_argument("-sT","--show_translation",default=False,type=bool,help="Do you want to show the translation of the alignments")
+        igspec.add_argument("-sT","--show_translation",default=False,action="store_true",help="Do you want to show the translation of the alignments")
 
         #General Blast Settings
         general = self.parser.add_argument_group(
             title="\nGeneral Settings",description="General Settings for Blast")
-        general.add_argument("-x",'--executable',type=str,default='/usr/bin/igblastn',help="The location of the executable, default is /usr/bin/igblastn")
+        general.add_argument("-x",'--executable',type=self._check_if_executable_exists,default='/usr/bin/igblastn',help="The location of the executable, default is /usr/bin/igblastn")
         general.add_argument("-o","--out",help="output file prefix",default="igblast_out_")
         general.add_argument("-e","--e_value",type=str,default="1e-15",help="Real value for excpectation value threshold in blast, put in scientific notation")
         general.add_argument("-w","--word_size",type=int,default=4,help="Word size for wordfinder algorithm")
@@ -66,6 +66,9 @@ class blastargument_parser():
          qseqid sseqid pident length mismatch gapopen qstart qend sstart send\n\n\
          The format file is in the database path as format_template.txt. Uncomment out the metrics you want to use")
 
+        
+        #one special boolean case
+        self.show_translation = False
         #return the arguments
         self.args = self.parser.parse_args()
         #get them ready to ship out
@@ -83,7 +86,7 @@ class blastargument_parser():
             msg = "{0} is not a fasta file\n".format(f_file)
             raise argparse.ArgumentTypeError(msg)
 
-    def check_if_executable_exists(self,x_path):
+    def _check_if_executable_exists(self,x_path):
         if not os.path.exists(x_path):
             msg = "path to executable {0}does not exist\n".format(x_path)
             raise argparse.ArgumentTypeError(msg)
@@ -139,7 +142,7 @@ class blastargument_parser():
         if self.args.reward_match:
             self.args_dict['-reward'] = self.args.reward_match 
         if self.args.show_translation:
-            self.args_dict['-show_translation']=''
+            self.show_translation = True
         if self.args.aux_path:
             self.args_dict['-auxiliary_data'] = "{0}{1}_gl.aux".format(self.args.aux_path,self.args.organism)
     
@@ -155,13 +158,13 @@ class blastargument_parser():
                 else:
                     formatting_titles.append(line.split()[0])
             
-            format = "\"7 " + " ".join(formatting_titles) +"\"" 
+            format = "7 " + " ".join(formatting_titles) 
             self.args_dict['-outfmt'] = format
 
 
 
 
-    #only non memeber function needed 
+    #only non memeber functions needed 
     def return_parsed_args(self):
         return self.args_dict
 
