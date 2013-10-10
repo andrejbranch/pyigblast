@@ -3,7 +3,10 @@ import subprocess as sp
 import multiprocessing as mp
 import glob
 import os
-import Bio
+try:
+    import Bio
+except ImportError("Trouble Installing BioPython:"):
+    print "Can't find BioPython Module in this path. PyIgBlast is dependent on Biopython"
 from time import time
 
 # setup global class to pass around the command line
@@ -89,7 +92,7 @@ def concat_files(out_files):
             os.remove(fname)
 
 
-if __name__ == '__main__':
+def main():
     now = time()
     num_procs = arg_parser.args.num_procs - 1
     mp_pool = mp.Pool(processes=num_procs)
