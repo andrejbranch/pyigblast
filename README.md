@@ -9,3 +9,5 @@ PyIgBlast - Open source Parser to call IgBlast and parse results for high-throug
 8/6/2013 Full functionality with multiprocessing and a formatting template
 
 8/7/2013 Can run on blue cluster
+
+8/9/2013 Parses output from igblast into python classes
