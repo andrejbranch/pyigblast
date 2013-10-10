@@ -1,1 +1,1 @@
-import regex
+import sys

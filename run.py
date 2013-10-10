@@ -89,7 +89,7 @@ def concat_files(out_files):
             os.remove(fname)
 
 
-if __name__ == '__main__':
+def main():
     now = time()
     num_procs = arg_parser.args.num_procs - 1
     mp_pool = mp.Pool(processes=num_procs)
