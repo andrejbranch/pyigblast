@@ -3,7 +3,10 @@ import subprocess as sp
 import multiprocessing as mp
 import glob
 import os
-import Bio
+try:
+    import Bio
+except ImportError("Trouble Installing BioPython:"):
+    print "Can't find BioPython Module in this path. PyIgBlast is dependent on Biopython"
 from time import time
 
 # setup global class to pass around the command line
