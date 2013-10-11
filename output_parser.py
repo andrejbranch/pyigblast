@@ -6,9 +6,10 @@ try:
 except ImportError:
 	print "Need Biopython to use the IgBlast output parser class"
 
+
 class igblast_output():
 
-    '''Pass the hole output to this class and it will deal with it
+    '''Pass the whole output to this class and it will deal with it
     Args:
     file - string for the filename to parse
     output - string for the filename to the output
@@ -31,9 +32,7 @@ class igblast_output():
                     query_holder.append(line)
             f.write(single_blast_entry(query_holder).return_json_document())
 
-
 class single_blast_entry():
-
     '''The helper class to parse an individual blast result'''
 
     def __init__(self, query):
