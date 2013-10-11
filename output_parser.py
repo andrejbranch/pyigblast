@@ -1,5 +1,6 @@
 import sys
 import json
+import gzip
 try:
 	from Bio.Seq import Seq
 	from Bio.Alphabet import IUPAC
@@ -15,10 +16,14 @@ class igblast_output():
     output - string for the filename to the output
     '''
 
-    def __init__(self, file, output_file="igblast_output.json"):
+    def __init__(self, file, output_file, gz=False):
         breaker = True
         query_holder = []
-        with open(output_file, 'w') as f:
+        if gz:
+            z = gzip.open(output_file+".gz",'wb')
+        else:
+            z = open(output_file,'w')
+        with z as f:
             for line in open(file):
                 if "IGBLASTN" in line:
                     breaker = False
@@ -31,6 +36,7 @@ class igblast_output():
                 if not breaker:
                     query_holder.append(line)
             f.write(single_blast_entry(query_holder).return_json_document())
+            f.write("\n")
 
 class single_blast_entry():
     '''The helper class to parse an individual blast result'''
@@ -352,4 +358,4 @@ class single_blast_entry():
 
 if __name__ == '__main__':
 	to_convert = sys.argv[1]
-	igblast_output(to_convert)
+	igblast_output(to_convert,"test_out.json")
