@@ -64,7 +64,7 @@ class blastargument_parser():
             "-x", '--executable', type=self._check_if_executable_exists,
             help="The location of the executable, default is /usr/bin/igblastn")
         general.add_argument(
-            "-o", "--out", help="output file prefix", default="igblast_out_")
+            "-o", "--out", help="output file prefix", default="igblast_out")
         general.add_argument("-e", "--e_value", type=str, default="1e-15",
                              help="Real value for excpectation value threshold in blast, put in scientific notation")
         general.add_argument("-w", "--word_size", type=int,
@@ -82,9 +82,20 @@ class blastargument_parser():
         formatter = self.parser.add_argument_group(
             title="Formatting Options", description="Formatting options mostly available"
         )
+
         formatter.add_argument("-f", "--format_options", type=str, default="default", help="default is a tab seperated format of\n\n\
          qseqid sseqid pident length mismatch gapopen qstart qend sstart send\n\n\
          The format file is in the database path as format_template.txt. Uncomment out the metrics you want to use")
+        formatter.add_argument("-z","--zip",default=False,action="store_true",help="Zip up all output files")
+        formatter.add_argument("-c","--concatenate",default=True,action="store_false",help="Turn off automatic concatenation and deletion of temporary files. Files are split up at the beginning to run across multiple processors")
+
+       
+        json_specific = self.parser.add_argument_group(
+            title="\nOutput parsing settings",description = "These are the options for creating a JSON files from the blastoutput that is easily uploaded to a mongo database")
+        json_specific.add_argument("-j","--json",action="store_true",default=False,help="Use the JSON output option that will format the text driven igblast output to a json document")
+        json_specific.add_argument("-jp","--json_prefix",default="igblast_output",help="The prefix for json_output files")
+
+
 
         # one special boolean case
         self.show_translation = False
