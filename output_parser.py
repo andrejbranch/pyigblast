@@ -26,10 +26,30 @@ class single_blast_entry():
 		_rearrangment_breaker = False
 		_junction_breaker = False
 		_fields_breaker = False
+		
+		#initalize the fields, some can be empty on crappy reads
+		#basic
+		self.query = ""
+		self.domain_classification = ""
+		
+		#title fields
+		self.alignment_summary_titles = ""
+		self.junction_detail_titles = ""
+		self.hit_fields = ""
+		
+		#summaries
+		self.rearrangment_summary = ""
+		self.junction_detail = ""
+		self.fr3_alignment_summary = ""
+		self.cdr3_alignment_sumary = ""
+		self.total_alignment_summary = ""
+		
+		#hits
 		self.hits_v = [] # to be parsed in another function
 		self.hits_d = [] # to be parsed in another function
 		self.hits_j = [] # to be parsed in another function
-		self.domain_classification = ""
+		
+		#will hold everything
 		self.blast_dict = {}
 		for line in query:
 			if "Query" in line:
@@ -44,7 +64,7 @@ class single_blast_entry():
 				self.rearrangment_summary = line.strip().split("\t")
 				_rearrangment_breaker = False
 			if "junction details" in line:
-				self.junction_detail_titles = line.strip().split("(")[2].split(")")[0].split("\t")
+				self.junction_detail_titles = line.strip().split("(")[2].split(")")[0].split(",")
 				_junction_breaker = True
 				continue
 			if _junction_breaker:
@@ -71,8 +91,6 @@ class single_blast_entry():
 					self.hits_j.append(line)
 		
 		self.process()
-		print self.blast_dict
-		sys.exit()
 		
 
 	def process(self):
@@ -154,4 +172,4 @@ class single_blast_entry():
 
 
 if __name__ == '__main__':
-	igblast_output("igblast_out_all.blast_out")
+	igblast_output("test.blast_out")
